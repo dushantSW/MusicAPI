@@ -9,6 +9,5 @@ import lombok.Data;
  */
 @Data
 public class About {
-    private String url;
     private String text;
 }
