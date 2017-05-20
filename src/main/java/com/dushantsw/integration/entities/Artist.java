@@ -1,5 +1,6 @@
 package com.dushantsw.integration.entities;
 
+import lombok.Builder;
 import lombok.Data;
 
 import java.util.List;
@@ -10,7 +11,11 @@ import java.util.List;
  * @author dushantsw
  */
 @Data
+@Builder
 public class Artist {
+    private String mbId;
+    private String title;
+    private String group;
     private List<Album> albums;
     private About about;
 }
