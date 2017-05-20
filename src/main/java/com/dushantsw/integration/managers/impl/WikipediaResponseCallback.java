@@ -58,8 +58,7 @@ class WikipediaResponseCallback implements Callback<String> {
                     return;
                 }
 
-                About about = new About();
-                about.setText(element.get("extract").getAsString());
+                About about = About.builder().text(element.get("extract").getAsString()).build();
                 callback.onWikipediaInformationDownloaded(about);
             }
         }
