@@ -39,38 +39,38 @@ class CoverArtResponseCallback implements Callback<String> {
     @Override
     public void completed(HttpResponse<String> httpResponse) {
         if (httpResponse.getStatus() == 404) {
-            callback.OnCovertArtRetrievingFailed(new ImageRetrievingException("cover_art_not_found"));
+            callback.onCovertArtRetrievingFailed(new ImageRetrievingException("cover_art_not_found"));
             return;
         }
 
         if (httpResponse.getStatus() >= 200 && httpResponse.getStatus() <= 400) {
             CoverArt coverArt = new Gson().fromJson(httpResponse.getBody(), CoverArt.class);
             if (coverArt == null) {
-                callback.OnCovertArtRetrievingFailed(new ImageRetrievingException("json_parse_failed"));
+                callback.onCovertArtRetrievingFailed(new ImageRetrievingException("json_parse_failed"));
                 return;
             }
 
             CoverArtImage image = coverArt.images.stream().filter(ci -> ci.front).findAny().orElse(null);
             if (image == null) {
-                callback.OnCovertArtRetrievingFailed(new ImageRetrievingException("no_front_image"));
+                callback.onCovertArtRetrievingFailed(new ImageRetrievingException("no_front_image"));
                 return;
             }
 
             Images images = getImages(image);
             if (images == null) return;
 
-            callback.OnCovertArtRetrievingFinished(images);
+            callback.onCovertArtRetrievingFinished(images);
         }
     }
 
     @Override
     public void failed(UnirestException e) {
-        callback.OnCovertArtRetrievingFailed((ImageRetrievingException) e);
+        callback.onCovertArtRetrievingFailed((ImageRetrievingException) e);
     }
 
     @Override
     public void cancelled() {
-        callback.OnCovertArtRetrievingFailed(new ImageRetrievingException("request_cancelled"));
+        callback.onCovertArtRetrievingFailed(new ImageRetrievingException("request_cancelled"));
     }
 
     private Images getImages(CoverArtImage image) {
@@ -80,7 +80,7 @@ class CoverArtResponseCallback implements Callback<String> {
             images.addNewImage(Image.ImageType.Large, image.thumbnails.get("large"));
             images.addNewImage(Image.ImageType.Small, image.thumbnails.get("small"));
         } catch (InvalidURLException e) {
-            callback.OnCovertArtRetrievingFailed(new ImageRetrievingException(e.getMessage(), e));
+            callback.onCovertArtRetrievingFailed(new ImageRetrievingException(e.getMessage(), e));
             return null;
         }
         return images;

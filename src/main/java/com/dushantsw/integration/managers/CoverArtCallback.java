@@ -17,12 +17,12 @@ public interface CoverArtCallback {
      *               every type of image and its {@link com.dushantsw.integration.entities.ImageUrl}
      * @see com.dushantsw.integration.entities.Image.ImageType
      */
-    void OnCovertArtRetrievingFinished(Images images);
+    void onCovertArtRetrievingFinished(Images images);
 
     /**
      * Method is called when data is not found or parsing exceptions happen
      *
      * @param ex {@link ImageRetrievingException} containing messages and causes.
      */
-    void OnCovertArtRetrievingFailed(ImageRetrievingException ex);
+    void onCovertArtRetrievingFailed(ImageRetrievingException ex);
 }

@@ -46,12 +46,12 @@ public class CoverArtTest {
         String INVALID_MBID = "1b023e01-4d56-387b-8758-8678046e4cef";
         client.getCoverImagesByMBID(INVALID_MBID, new CoverArtCallback() {
             @Override
-            public void OnCovertArtRetrievingFinished(Images images) {
+            public void onCovertArtRetrievingFinished(Images images) {
                 fail();
             }
 
             @Override
-            public void OnCovertArtRetrievingFailed(ImageRetrievingException ex) {
+            public void onCovertArtRetrievingFailed(ImageRetrievingException ex) {
                 Assert.assertNotNull(ex);
                 Assert.assertEquals("cover_art_not_found", ex.getMessage());
                 lock.countDown();
@@ -68,7 +68,7 @@ public class CoverArtTest {
         String RELEASE_MBID = "1b022e01-4da6-387b-8658-8678046e4cef";
         client.getCoverImagesByMBID(RELEASE_MBID, new CoverArtCallback() {
             @Override
-            public void OnCovertArtRetrievingFinished(Images images) {
+            public void onCovertArtRetrievingFinished(Images images) {
                 Assert.assertNotNull(images);
                 Assert.assertEquals(3, images.size());
                 images.forEach(image -> Assert.assertNotNull(image.getImageURL().getUrl()));
@@ -77,7 +77,7 @@ public class CoverArtTest {
             }
 
             @Override
-            public void OnCovertArtRetrievingFailed(ImageRetrievingException ex) {
+            public void onCovertArtRetrievingFailed(ImageRetrievingException ex) {
                 fail();
             }
         });
