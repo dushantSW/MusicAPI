@@ -45,20 +45,24 @@ public class DefaultCoverArtArchiveClient implements CoverArtArchiveClient {
         }
 
         if (httpResponse.getStatus() >= 200 && httpResponse.getStatus() <= 400) {
-            CoverArt coverArt = new Gson().fromJson(httpResponse.getBody(), CoverArt.class);
-            if (coverArt == null) {
-                throw new ImageRetrievingException("json_parse_failed");
-            }
-
-            CoverArtImage image = coverArt.images.stream().filter(ci -> ci.front).findAny().orElse(null);
-            if (image == null) {
-                throw new ImageRetrievingException("no_front_image");
-            }
-
-            return getImages(image);
+            return getImages(httpResponse);
         }
 
         return null;
+    }
+
+    private Images getImages(HttpResponse<String> httpResponse) throws ImageRetrievingException {
+        CoverArt coverArt = new Gson().fromJson(httpResponse.getBody(), CoverArt.class);
+        if (coverArt == null) {
+            throw new ImageRetrievingException("json_parse_failed");
+        }
+
+        CoverArtImage image = coverArt.images.stream().filter(ci -> ci.front).findAny().orElse(null);
+        if (image == null) {
+            throw new ImageRetrievingException("no_front_image");
+        }
+
+        return getImages(image);
     }
 
     private Images getImages(CoverArtImage image) {

@@ -14,7 +14,6 @@ public interface WikipediaClient {
      * Sends an asynchronous request to Wikipedia API to get images for the
      * given {@code name}
      *
-     * @param callback {@link WikipediaCallback} for events.
      * @param name     of the page.
      */
     About getWikiPageOfArtistByName(final String name) throws AboutRetrievingException;

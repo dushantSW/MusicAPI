@@ -6,17 +6,11 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import lombok.Data;
 import org.apache.commons.validator.UrlValidator;
 
-/**
- * <code>ImageUrl</code>
- *
- * @author dushantsw
- */
 @Data
 @JsonSerialize(using = ImageUrlSerializer.class)
 @SuppressWarnings("WeakerAccess")
 public class ImageUrl {
     private String url;
-
     private ImageUrl(String url) {
         this.url = url;
     }

@@ -3,7 +3,8 @@ package com.dushantsw.utilities;
 import java.util.UUID;
 
 /**
- * <code>Commons</code>
+ * <code>Commons</code> contains variables and methods which are commonly used
+ * by the system.
  *
  * @author dushantsw
  */

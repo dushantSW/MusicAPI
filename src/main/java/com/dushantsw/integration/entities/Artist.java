@@ -13,6 +13,7 @@ import java.util.List;
 @Data
 @Builder
 public class Artist {
+    @SuppressWarnings("unused")
     public enum ArtistType {
         GROUP, PERSON
     }

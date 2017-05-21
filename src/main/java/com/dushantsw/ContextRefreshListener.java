@@ -7,7 +7,6 @@ import org.apache.http.client.ServiceUnavailableRetryStrategy;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.DefaultHttpRequestRetryHandler;
-import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.cache.CacheConfig;
 import org.apache.http.impl.client.cache.CachingHttpClients;
 import org.apache.http.impl.client.cache.ExponentialBackOffSchedulingStrategy;
@@ -17,7 +16,8 @@ import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.stereotype.Component;
 
 /**
- * <code>ContextRefreshListener</code>
+ * <code>ContextRefreshListener</code> implements {@link ApplicationListener} is called
+ * for setting up http client cache and retry options.
  *
  * @author dushantsw
  */

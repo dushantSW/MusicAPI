@@ -5,7 +5,8 @@ import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 /**
- * <code>Application</code>
+ * <code>Application</code> is the main for starting the application with
+ * Spring boot.
  *
  * @author dushantsw
  */

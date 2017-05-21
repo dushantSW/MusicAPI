@@ -18,7 +18,8 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
- * <code>DefaultMusicBrainzClient</code>
+ * <code>DefaultMusicBrainzClient</code> provides default implementation for {@link MusicBrainzClient}
+ * and its methods.
  *
  * @author dushantsw
  */

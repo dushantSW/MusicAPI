@@ -15,7 +15,6 @@ public interface CoverArtArchiveClient {
      * Sends an asynchronous request to CoverArtArchive API to get images for the
      * given {@code mbId}
      *
-     * @param callback {@link CoverArtCallback} for receiving events
      * @param mbId     UUID of MusicBrainz as string
      * @throws InvalidMBIDException if {@code mbId} is null or invalid.
      */
