@@ -1,18 +1,23 @@
 package com.dushantsw.integration.managers.impl;
 
+import com.dushantsw.integration.cache.CacheStorage;
 import com.dushantsw.integration.entities.Image;
 import com.dushantsw.integration.entities.Images;
+import com.dushantsw.integration.entities.MBID;
 import com.dushantsw.integration.entities.exceptions.InvalidURLException;
 import com.dushantsw.integration.managers.CoverArtArchiveClient;
 import com.dushantsw.integration.managers.exceptions.ImageRetrievingException;
 import com.dushantsw.integration.managers.exceptions.InvalidMBIDException;
 import com.dushantsw.utilities.Commons;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.gson.Gson;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 
+import java.io.IOException;
 import java.io.Serializable;
+import java.io.UnsupportedEncodingException;
 import java.util.List;
 import java.util.Map;
 
@@ -23,6 +28,11 @@ import java.util.Map;
  * @author dushantsw
  */
 public class DefaultCoverArtArchiveClient implements CoverArtArchiveClient {
+    private CacheStorage<Images> cacheStorage;
+
+    public DefaultCoverArtArchiveClient(CacheStorage<Images> cacheStorage) {
+        this.cacheStorage = cacheStorage;
+    }
 
     @Override
     public Images getCoverImagesByMBID(String mbId) throws InvalidMBIDException, ImageRetrievingException {
@@ -32,6 +42,25 @@ public class DefaultCoverArtArchiveClient implements CoverArtArchiveClient {
         if (!Commons.isUUIDValid(mbId))
             throw new InvalidMBIDException("Invalid mbid");
 
+        Images images = null;
+
+        if (cacheStorage != null && cacheStorage.isStorageAvailable()) {
+            try {
+                images = cacheStorage.getFromStorage(MBID.ofMbId(mbId));
+            } catch (IOException e) {
+                e.printStackTrace();        // Ignore error.
+            }
+
+            if (images == null)
+                images = loadImagesFromNetwork(mbId);
+        } else {
+            images = loadImagesFromNetwork(mbId);
+        }
+
+        return images;
+    }
+
+    private Images loadImagesFromNetwork(String mbId) throws ImageRetrievingException, InvalidMBIDException {
         HttpResponse<String> httpResponse;
         try {
             httpResponse = Unirest.get(Commons.COVER_ART_BASE_URL.concat(mbId))
@@ -44,11 +73,20 @@ public class DefaultCoverArtArchiveClient implements CoverArtArchiveClient {
             throw new ImageRetrievingException("cover_art_not_found for id: " + mbId);
         }
 
+        Images images = null;
         if (httpResponse.getStatus() >= 200 && httpResponse.getStatus() <= 400) {
-            return getImages(httpResponse);
+            images =  getImages(httpResponse);
+
+            if (images != null && cacheStorage != null && cacheStorage.isStorageAvailable()) {
+                try {
+                    cacheStorage.storeIntoStorage(MBID.ofMbId(mbId), images);
+                } catch (JsonProcessingException | UnsupportedEncodingException e) {
+                    e.printStackTrace();            // TODO: Better log
+                }
+            }
         }
 
-        return null;
+        return images;
     }
 
     private Images getImages(HttpResponse<String> httpResponse) throws ImageRetrievingException {

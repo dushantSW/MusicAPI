@@ -1,10 +1,12 @@
 package com.dushantsw.integration.managers.impl;
 
+import com.dushantsw.integration.cache.CacheStorage;
 import com.dushantsw.integration.entities.*;
 import com.dushantsw.integration.managers.MusicBrainzClient;
 import com.dushantsw.integration.managers.exceptions.InvalidMBIDException;
 import com.dushantsw.integration.managers.exceptions.MusicBrainzException;
 import com.dushantsw.utilities.Commons;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.annotations.SerializedName;
@@ -12,7 +14,9 @@ import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 
+import java.io.IOException;
 import java.io.Serializable;
+import java.io.UnsupportedEncodingException;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -24,6 +28,14 @@ import java.util.stream.Collectors;
  * @author dushantsw
  */
 public class DefaultMusicBrainzClient implements MusicBrainzClient {
+    private CacheStorage<Artist> cacheStorage;
+
+    public DefaultMusicBrainzClient(CacheStorage<Artist> cacheStorage) {
+        this.cacheStorage = cacheStorage;
+    }
+
+    public DefaultMusicBrainzClient() {}
+
     @Override
     public Artist getArtistByMBId(String mbId) throws InvalidMBIDException, MusicBrainzException {
         if (mbId == null || mbId.isEmpty())
@@ -32,8 +44,24 @@ public class DefaultMusicBrainzClient implements MusicBrainzClient {
         if (!Commons.isUUIDValid(mbId))
             throw new InvalidMBIDException("invalid mbid");
 
-        HttpResponse<String> httpResponse = null;
+        Artist artist;
+        if (cacheStorage != null && cacheStorage.isStorageAvailable()) {
+            try {
+                artist = cacheStorage.getFromStorage(MBID.ofMbId(mbId));
+            } catch (IOException e) {
+                throw new MusicBrainzException(e);
+            }
+            if (artist == null)
+                artist = getArtistFromNetwork(mbId);
+        } else {
+            artist = getArtistFromNetwork(mbId);
+        }
 
+        return artist;
+    }
+
+    private Artist getArtistFromNetwork(String mbId) throws MusicBrainzException, InvalidMBIDException {
+        HttpResponse<String> httpResponse;
         try {
             httpResponse = Unirest.get(Commons.MUSICBRAINZ_BASE_URL.concat(mbId))
                     .queryString("fmt", "json")
@@ -48,12 +76,22 @@ public class DefaultMusicBrainzClient implements MusicBrainzClient {
         if (httpResponse.getStatus() == 404)
             throw new MusicBrainzException("No artist found with given mbId");
 
+        Artist artist = null;
         if (httpResponse.getStatus() == 200 || httpResponse.getStatus() == 201) {
             MusicBrainz artistBrainz = new Gson().fromJson(httpResponse.getBody(), MusicBrainz.class);
-            return parseMusicBrainz(artistBrainz);
+            artist = parseMusicBrainz(artistBrainz);
+
+            // Store the artist into storage
+            if (cacheStorage != null && cacheStorage.isStorageAvailable()) {
+                try {
+                    cacheStorage.storeIntoStorage(artist.getMbId(), artist);
+                } catch (JsonProcessingException | UnsupportedEncodingException e) {
+                    e.printStackTrace();            // Ignore errors or log them better.
+                }
+            }
         }
 
-        return null;
+        return artist;
     }
 
     private Artist parseMusicBrainz(MusicBrainz artistBrainz) throws InvalidMBIDException {

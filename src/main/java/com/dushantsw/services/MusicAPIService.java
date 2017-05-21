@@ -1,8 +1,12 @@
 package com.dushantsw.services;
 
+import com.dushantsw.integration.cache.impl.redis.CoverArtRedisStorage;
+import com.dushantsw.integration.cache.impl.redis.MusicBrainzRedisStorage;
+import com.dushantsw.integration.cache.impl.redis.WikipediaRedisStorage;
 import com.dushantsw.integration.entities.Artist;
 import com.dushantsw.integration.managers.CoverArtArchiveClient;
 import com.dushantsw.integration.managers.MusicBrainzClient;
+import com.dushantsw.integration.managers.RedisManager;
 import com.dushantsw.integration.managers.WikipediaClient;
 import com.dushantsw.integration.managers.exceptions.AboutRetrievingException;
 import com.dushantsw.integration.managers.exceptions.ImageRetrievingException;
@@ -12,7 +16,11 @@ import com.dushantsw.integration.managers.impl.DefaultCoverArtArchiveClient;
 import com.dushantsw.integration.managers.impl.DefaultMusicBrainzClient;
 import com.dushantsw.integration.managers.impl.DefaultWikipediaClient;
 import org.springframework.stereotype.Component;
+import redis.clients.jedis.Jedis;
+import redis.clients.jedis.JedisCluster;
+import redis.clients.jedis.JedisPool;
 
+import javax.annotation.PostConstruct;
 import javax.naming.ServiceUnavailableException;
 
 /**
@@ -30,10 +38,13 @@ public class MusicAPIService {
     /**
      * Constructs a new instance of service.
      */
-    public MusicAPIService() {
-        this.musicBrainzClient = new DefaultMusicBrainzClient();
-        this.coverArtArchiveClient = new DefaultCoverArtArchiveClient();
-        this.wikipediaClient = new DefaultWikipediaClient();
+    @PostConstruct
+    public void initApiService() {
+        JedisPool pool = RedisManager.getSharedManager().getJedisPool();
+
+        this.musicBrainzClient = new DefaultMusicBrainzClient(new MusicBrainzRedisStorage(pool));
+        this.coverArtArchiveClient = new DefaultCoverArtArchiveClient(new CoverArtRedisStorage(pool));
+        this.wikipediaClient = new DefaultWikipediaClient(new WikipediaRedisStorage(pool));
     }
 
     /**
