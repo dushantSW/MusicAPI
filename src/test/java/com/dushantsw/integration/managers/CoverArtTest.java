@@ -1,5 +1,6 @@
 package com.dushantsw.integration.managers;
 
+import com.dushantsw.integration.cache.impl.redis.CoverArtRedisStorage;
 import com.dushantsw.integration.entities.Images;
 import com.dushantsw.integration.managers.exceptions.ImageRetrievingException;
 import com.dushantsw.integration.managers.exceptions.InvalidMBIDException;
@@ -7,6 +8,9 @@ import com.dushantsw.integration.managers.impl.DefaultCoverArtArchiveClient;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import redis.clients.jedis.Jedis;
+import redis.clients.jedis.JedisPool;
+import redis.clients.jedis.JedisPoolConfig;
 
 /**
  * <code>CoverArtTest</code>
@@ -18,7 +22,10 @@ public class CoverArtTest {
 
     @Before
     public void beforeTests() {
-        client = new DefaultCoverArtArchiveClient();
+        JedisPoolConfig poolConfig = new JedisPoolConfig();
+        poolConfig.setMaxTotal(100);
+        JedisPool pool = new JedisPool(poolConfig, "localhost", 6379);
+        client = new DefaultCoverArtArchiveClient(new CoverArtRedisStorage(pool));
     }
 
     @Test(expected = InvalidMBIDException.class)

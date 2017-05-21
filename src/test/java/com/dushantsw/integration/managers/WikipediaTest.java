@@ -1,11 +1,14 @@
 package com.dushantsw.integration.managers;
 
+import com.dushantsw.integration.cache.impl.redis.WikipediaRedisStorage;
 import com.dushantsw.integration.entities.About;
 import com.dushantsw.integration.managers.exceptions.AboutRetrievingException;
 import com.dushantsw.integration.managers.impl.DefaultWikipediaClient;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import redis.clients.jedis.JedisPool;
+import redis.clients.jedis.JedisPoolConfig;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
@@ -22,7 +25,10 @@ public class WikipediaTest {
 
     @Before
     public void beforeTests() {
-        client = new DefaultWikipediaClient();
+        JedisPoolConfig poolConfig = new JedisPoolConfig();
+        poolConfig.setMaxTotal(100);
+        JedisPool pool = new JedisPool(poolConfig, "localhost", 6379);
+        client = new DefaultWikipediaClient(new WikipediaRedisStorage(pool));
     }
 
     @Test(expected = IllegalArgumentException.class)
