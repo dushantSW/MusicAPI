@@ -1,6 +1,7 @@
 package com.dushantsw.integration.entities;
 
 import com.dushantsw.integration.entities.exceptions.InvalidURLException;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
 /**
@@ -9,6 +10,7 @@ import lombok.Data;
  * @author dushantsw
  */
 @Data
+@SuppressWarnings("WeakerAccess")
 public class Image {
     public enum ImageType {
         Original,
@@ -17,7 +19,7 @@ public class Image {
     }
 
     private ImageType type;
-    private ImageUrl imageURL;
+    private @JsonProperty("url") ImageUrl imageURL;
 
     private Image(ImageType type, ImageUrl imageURL) {
         this.type = type;

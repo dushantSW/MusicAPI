@@ -1,6 +1,8 @@
 package com.dushantsw.integration.entities;
 
 import com.dushantsw.integration.entities.exceptions.InvalidURLException;
+import com.dushantsw.integration.entities.serializers.ImageUrlSerializer;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import lombok.Data;
 import org.apache.commons.validator.UrlValidator;
 
@@ -10,6 +12,8 @@ import org.apache.commons.validator.UrlValidator;
  * @author dushantsw
  */
 @Data
+@JsonSerialize(using = ImageUrlSerializer.class)
+@SuppressWarnings("WeakerAccess")
 public class ImageUrl {
     private String url;
 

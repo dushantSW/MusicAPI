@@ -1,5 +1,7 @@
 package com.dushantsw.integration.entities;
 
+import com.dushantsw.integration.entities.serializers.AlbumTitleSerializer;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import lombok.Data;
 
 /**
@@ -9,6 +11,7 @@ import lombok.Data;
  * @author dushantsw
  */
 @Data
+@JsonSerialize(using = AlbumTitleSerializer.class)
 public class AlbumTitle {
     private String title;
 

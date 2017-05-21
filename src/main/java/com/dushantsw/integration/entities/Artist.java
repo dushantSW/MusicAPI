@@ -13,9 +13,13 @@ import java.util.List;
 @Data
 @Builder
 public class Artist {
-    private String mbId;
+    public enum ArtistType {
+        GROUP, PERSON
+    }
+
+    private MBID mbId;
     private String title;
-    private String group;
+    private ArtistType type;
     private List<Album> albums;
     private About about;
 }
