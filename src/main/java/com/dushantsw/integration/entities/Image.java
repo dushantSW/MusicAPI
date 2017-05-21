@@ -17,6 +17,9 @@ public class Image {
     private @JsonProperty("url")
     ImageUrl imageURL;
 
+    // Jackson destroyed the purpose of class.
+    protected Image() {}
+
     private Image(ImageType type, ImageUrl imageURL) {
         this.type = type;
         this.imageURL = imageURL;
