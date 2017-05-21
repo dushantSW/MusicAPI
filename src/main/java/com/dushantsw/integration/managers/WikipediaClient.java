@@ -1,5 +1,8 @@
 package com.dushantsw.integration.managers;
 
+import com.dushantsw.integration.entities.About;
+import com.dushantsw.integration.managers.exceptions.AboutRetrievingException;
+
 /**
  * Provides access to the Wikipedia.
  *
@@ -11,8 +14,8 @@ public interface WikipediaClient {
      * Sends an asynchronous request to Wikipedia API to get images for the
      * given {@code name}
      *
-     * @param name     of the page.
      * @param callback {@link WikipediaCallback} for events.
+     * @param name     of the page.
      */
-    void getWikiPageOfArtistByName(final String name, final WikipediaCallback callback);
+    About getWikiPageOfArtistByName(final String name) throws AboutRetrievingException;
 }

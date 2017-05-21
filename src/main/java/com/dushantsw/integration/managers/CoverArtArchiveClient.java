@@ -1,5 +1,7 @@
 package com.dushantsw.integration.managers;
 
+import com.dushantsw.integration.entities.Images;
+import com.dushantsw.integration.managers.exceptions.ImageRetrievingException;
 import com.dushantsw.integration.managers.exceptions.InvalidMBIDException;
 
 /**
@@ -13,9 +15,9 @@ public interface CoverArtArchiveClient {
      * Sends an asynchronous request to CoverArtArchive API to get images for the
      * given {@code mbId}
      *
-     * @param mbId     UUID of MusicBrainz as string
      * @param callback {@link CoverArtCallback} for receiving events
+     * @param mbId     UUID of MusicBrainz as string
      * @throws InvalidMBIDException if {@code mbId} is null or invalid.
      */
-    void getCoverImagesByMBID(final String mbId, final CoverArtCallback callback) throws InvalidMBIDException;
+    Images getCoverImagesByMBID(final String mbId) throws InvalidMBIDException, ImageRetrievingException;
 }

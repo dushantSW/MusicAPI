@@ -1,9 +1,6 @@
 package com.dushantsw.integration.managers.impl;
 
-import com.dushantsw.integration.entities.About;
-import com.dushantsw.integration.entities.Album;
-import com.dushantsw.integration.entities.AlbumTitle;
-import com.dushantsw.integration.entities.Artist;
+import com.dushantsw.integration.entities.*;
 import com.dushantsw.integration.managers.MusicBrainzClient;
 import com.dushantsw.integration.managers.exceptions.InvalidMBIDException;
 import com.dushantsw.integration.managers.exceptions.MusicBrainzException;
@@ -17,6 +14,7 @@ import com.mashape.unirest.http.exceptions.UnirestException;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -57,7 +55,7 @@ public class DefaultMusicBrainzClient implements MusicBrainzClient {
         return null;
     }
 
-    private Artist parseMusicBrainz(MusicBrainz artistBrainz) {
+    private Artist parseMusicBrainz(MusicBrainz artistBrainz) throws InvalidMBIDException {
         // Get wikipedia url
         String titleName = null;
         JsonObject wikipediaObject = artistBrainz.relations.stream().filter(jsonObject ->
@@ -70,36 +68,41 @@ public class DefaultMusicBrainzClient implements MusicBrainzClient {
 
         // Get all albums and their urls
         List<Album> albums = artistBrainz.groups.stream()
-                .map(releaseGroup -> Album.builder()
-                        .title(AlbumTitle.OfTitle(releaseGroup.title))
-                        .mbId(releaseGroup.id)
-                        .type(Album.AlbumType.valueOf(releaseGroup.primaryType.toUpperCase())).build())
-                .collect(Collectors.toList());
+                .map(releaseGroup -> {
+                    try {
+                        return createAlbum(releaseGroup);
+                    } catch (InvalidMBIDException e) {
+                        return null;
+                    }
+                }).filter(Objects::nonNull).collect(Collectors.toList());
 
         // Artist
         return Artist.builder()
-                .mbId(artistBrainz.id)
+                .mbId(MBID.ofMbId(artistBrainz.id))
                 .title(artistBrainz.name)
-                .group(artistBrainz.group)
+                .type(Artist.ArtistType.valueOf(artistBrainz.type.toUpperCase()))
                 .albums(albums)
                 .about(About.builder().title(titleName).build())
                 .build();
     }
 
+    private Album createAlbum(ReleaseGroup releaseGroup) throws InvalidMBIDException {
+        return Album.builder()
+                .title(AlbumTitle.OfTitle(releaseGroup.title))
+                .mbId(MBID.ofMbId(releaseGroup.id)).build();
+    }
+
     private class MusicBrainz implements Serializable {
         String id;
         String name;
-        String group;
+        String type;
         @SerializedName("release-groups")
         List<ReleaseGroup> groups;
         List<JsonObject> relations;
     }
 
     private class ReleaseGroup implements Serializable {
-        @SerializedName("primary-type-id")
         String id;
         String title;
-        @SerializedName("primary-type")
-        String primaryType;
     }
 }
