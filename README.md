@@ -8,7 +8,7 @@ Redis on docker are optional to run the application if you want cache. Otherwise
 
 ``` 
 cd release
-docker run redis 
+docker pull redis 
 docker network create -d bridge music-redis
 docker run -v "$(pwd)"/redis.conf:/usr/local/etc/redis/redis.conf --name music-redis --net music-redis -p 6379:6379 -d redis redis-server /usr/local/etc/redis/redis.conf
 
@@ -16,7 +16,7 @@ docker run -v "$(pwd)"/redis.conf:/usr/local/etc/redis/redis.conf --name music-r
 
 ### Run app
 ```
-java -jar ${JAVA_OPTS:--Xmx1024m} music-api.jar
+java -jar ${JAVA_OPTS:--Xmx1024m} Music*.jar
 
 ```
 
