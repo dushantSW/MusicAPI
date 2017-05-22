@@ -7,6 +7,7 @@ Redis on docker are optional to run the application if you want cache. Otherwise
 ### Redis cache
 
 ``` 
+cd release
 docker run redis 
 docker network create -d bridge music-redis
 docker run -v "$(pwd)"/redis.conf:/usr/local/etc/redis/redis.conf --name music-redis --net music-redis -p 6379:6379 -d redis redis-server /usr/local/etc/redis/redis.conf
