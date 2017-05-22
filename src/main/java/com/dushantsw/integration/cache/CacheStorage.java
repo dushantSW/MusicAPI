@@ -7,6 +7,7 @@ import lombok.Data;
 import org.springframework.util.StringUtils;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
+import redis.clients.jedis.exceptions.JedisConnectionException;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -22,10 +23,19 @@ import java.util.Base64;
 public abstract class CacheStorage<T> {
     public final ObjectMapper mapper;
     private final JedisPool pool;
+    private boolean isConnected = false;
 
     public CacheStorage(JedisPool pool) {
         this.pool = pool;
         this.mapper = new ObjectMapper();
+
+        try {
+            Jedis resource = getPool().getResource();
+            resource.close();
+            isConnected = true;
+        } catch (JedisConnectionException ex) {
+            System.out.println("No connection to redis");
+        }
     }
 
     public T getFromStorage(String id, Class<T> cls) throws IOException {
@@ -60,6 +70,6 @@ public abstract class CacheStorage<T> {
     }
 
     public boolean isStorageAvailable() {
-        return getPool() != null && !getPool().isClosed();
+        return getPool() != null && isConnected;
     }
 }

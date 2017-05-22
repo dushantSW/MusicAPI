@@ -21,9 +21,4 @@ public class MusicBrainzRedisStorage extends CacheStorage<Artist> {
     public Artist getFromStorage(MBID id) throws IOException {
         return getFromStorage(id.getId());
     }
-
-    @Override
-    public boolean isStorageAvailable() {
-        return this.getPool() != null && !this.getPool().isClosed();
-    }
 }

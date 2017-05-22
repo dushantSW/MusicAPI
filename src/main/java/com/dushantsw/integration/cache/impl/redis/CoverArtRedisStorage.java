@@ -25,9 +25,4 @@ public class CoverArtRedisStorage extends CacheStorage<Images> {
     public Images getFromStorage(MBID id) throws IOException {
         return getFromStorage(id.getId());
     }
-
-    @Override
-    public boolean isStorageAvailable() {
-        return this.getPool() != null && !this.getPool().isClosed();
-    }
 }
