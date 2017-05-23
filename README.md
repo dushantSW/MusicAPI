@@ -2,7 +2,6 @@
 Mashup of three api MusicBrainz, Wikipedia &amp; Cover Art Archive
 
 ## How to install
-Redis on docker are optional to run the application if you want cache. Otherwise jump to **run app**
 
 ### Redis cache
 
