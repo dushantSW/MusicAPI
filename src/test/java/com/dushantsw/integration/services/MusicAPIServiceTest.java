@@ -47,6 +47,7 @@ public class MusicAPIServiceTest {
                 .build();
         Unirest.setHttpClient(cachingClient);
         this.service = new MusicAPIService();
+        this.service.initApiService();
     }
 
     @Test

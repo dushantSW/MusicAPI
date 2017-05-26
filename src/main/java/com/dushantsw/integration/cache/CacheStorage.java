@@ -29,12 +29,14 @@ public abstract class CacheStorage<T> {
         this.pool = pool;
         this.mapper = new ObjectMapper();
 
-        try {
-            Jedis resource = getPool().getResource();
-            resource.close();
-            isConnected = true;
-        } catch (JedisConnectionException ex) {
-            System.out.println("No connection to redis");
+        if (pool != null) {
+            try {
+                Jedis resource = getPool().getResource();
+                resource.close();
+                isConnected = true;
+            } catch (JedisConnectionException ex) {
+                System.out.println("No connection to redis");
+            }
         }
     }
 
